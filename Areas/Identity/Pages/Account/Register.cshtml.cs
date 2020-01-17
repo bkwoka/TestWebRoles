@@ -45,6 +45,12 @@ namespace testWebRoles.Areas.Identity.Pages.Account
 
         public class InputModel
         {
+            
+            [Display(Name = "Username")]
+            [Required(ErrorMessage = "Username is required.")]
+            [RegularExpression("^[a-zA-Z0-9]*$", ErrorMessage = "Only Alphabets and Numbers allowed.")]
+            public string UserName { get; set; }
+            
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
@@ -74,9 +80,11 @@ namespace testWebRoles.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
-                var result = await _userManager.CreateAsync(user, Input.Password);
-                if (result.Succeeded)
+                var user = new IdentityUser { UserName = Input.UserName, Email = Input.Email };
+                var userRegisterResult = await _userManager.CreateAsync(user, Input.Password);
+                var roleUserAddRecord = await _userManager.AddToRoleAsync(user, "User");
+
+                if (userRegisterResult.Succeeded && roleUserAddRecord.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
@@ -101,7 +109,7 @@ namespace testWebRoles.Areas.Identity.Pages.Account
                         return LocalRedirect(returnUrl);
                     }
                 }
-                foreach (var error in result.Errors)
+                foreach (var error in userRegisterResult.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }

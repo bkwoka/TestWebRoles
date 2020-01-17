@@ -1,0 +1,12 @@
+﻿@model ViewStatisticsModel
+@{
+    ViewData["Title"] = "Statistics";
+    Layout = "_AdminPanelLayout";
+}
+
+<h1>Statistics</h1>
+
+<hr />
+
+<p>Number of registered users: @Model.UsersCount.ToString()</p>
+
